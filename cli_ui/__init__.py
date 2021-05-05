@@ -353,6 +353,47 @@ def info_progress(prefix: str, value: float, max_value: float) -> None:
         write_and_flush(sys.stdout, to_write)
 
 
+def info_progress_bar(
+    prefix: str, value: float, max_value: float, fileObj: FileObj = sys.stdout
+) -> None:
+    """ Display info progress as a bar.
+
+    :param value: the current value
+    :param max_value: the max value
+    :param prefix: the prefix message to print
+
+
+    """
+    MAX_SIZE = 10
+    BLOCK_CHAR = "█"
+    COLOR_LIST = [
+        colorama.Fore.RED + colorama.Style.BRIGHT,
+        colorama.Fore.RED + colorama.Style.BRIGHT,
+        colorama.Fore.RED + colorama.Style.NORMAL,
+        colorama.Fore.RED + colorama.Style.DIM,
+        colorama.Fore.GREEN + colorama.Style.DIM,
+        colorama.Fore.GREEN + colorama.Style.NORMAL,
+        colorama.Fore.GREEN + colorama.Style.BRIGHT,
+        colorama.Fore.GREEN + colorama.Style.BRIGHT,
+        colorama.Fore.GREEN + colorama.Style.BRIGHT,
+    ]
+    COLOR_RESET = colorama.Fore.WHITE + colorama.Style.NORMAL
+
+    percent = float(value) / max_value * 100
+    color = COLOR_LIST[int(percent / 12.5)]
+    value_size = int((float(value) * MAX_SIZE) / max_value)
+    if fileObj.isatty():
+        fileObj.write(
+            "{prefix}: |{blocks}{spaces}| {percent:>3.0f}%\r".format(
+                prefix=prefix,
+                blocks=color + value_size * BLOCK_CHAR + COLOR_RESET,
+                spaces=(MAX_SIZE - value_size) * " ",
+                percent=percent,
+            )
+        )
+        fileObj.flush()
+
+
 def debug(*tokens: Token, **kwargs: Any) -> None:
     """ Print a debug message.
 

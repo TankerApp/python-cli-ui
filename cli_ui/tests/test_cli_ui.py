@@ -104,6 +104,21 @@ def test_info_stdout_no_colors(dumb_tty: DumbTTY) -> None:
     assert actual == expected
 
 
+def test_info_progress_bar(smart_tty: SmartTTY) -> None:
+    cli_ui.info_progress_bar(">>> Test", 42, 100, fileObj=smart_tty)
+    actual = smart_tty.getvalue()
+    expected = (
+        f">>> Test: |"
+        + colorama.Fore.RED
+        + colorama.Style.DIM
+        + "████"
+        + colorama.Fore.WHITE
+        + colorama.Style.NORMAL
+        + "      |  42%\r"
+    )
+    assert actual == expected
+
+
 def test_info_characters(always_color: None, smart_tty: SmartTTY) -> None:
     cli_ui.info(
         "Doing stuff", cli_ui.ellipsis, "sucess", cli_ui.check, fileobj=smart_tty
